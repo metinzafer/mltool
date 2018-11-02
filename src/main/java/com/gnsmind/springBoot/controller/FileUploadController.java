@@ -28,7 +28,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.gnsmind.springBoot.constant.Constants;
 import com.gnsmind.springBoot.fileStore.FileStore;
-import com.gnsmind.springBoot.model.Ads;
 
 @RestController
 @RequestMapping(value = "/file")
@@ -38,7 +37,7 @@ public class FileUploadController {
 	public ModelAndView upload(@RequestParam("fileselect") MultipartFile[] inputFiles,
 							   ModelAndView modelAndView, 
 							   HttpServletRequest request,
-							   @RequestParam("memberAdPhoto") Optional<String> memberAdPhoto
+							   @RequestParam("userFile") Optional<String> userFile
 							  ) {
 		
 		FileStore fileInfo = new FileStore();
@@ -60,7 +59,7 @@ public class FileUploadController {
 				}
 				session.setAttribute("indexCounter", indexCounter);
 				//member ad photos
-				if(memberAdPhoto.isPresent() && memberAdPhoto.get().equals("true")){
+				if(userFile.isPresent() && userFile.get().equals("true")){
 					
 					if (inputFiles.length < 2) {
 						

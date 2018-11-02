@@ -212,7 +212,7 @@ button:hover {
 			<div class="panel-body" style="overflow-x: auto; text-align: center;">
 				<h1>
 					<a href="#" th:href="@{/}" style="text-decoration: none;">Machine
-						Learning Tool Ver. 001</a>
+						Learning Tool Ver. 002</a>
 				</h1>
 				<!-- One "tab" for each step in the form: -->
 				<div class="tab">
@@ -220,7 +220,7 @@ button:hover {
 					<h2 style="color: gray;">CSV File Upload</h2>
 					<hr>
 					<form role="form" id="upload" action="#"
-						th:action="@{/file/upload(memberAdPhoto='true')}" method="POST"
+						th:action="@{/file/upload(userFile='true')}" method="POST"
 						name="picForm" enctype="multipart/form-data">
 						<fieldset>
 							<div class="btn btn-info btn-post" onclick="getFile()"
