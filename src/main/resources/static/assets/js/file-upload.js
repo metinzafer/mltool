@@ -44,9 +44,9 @@ function sub() {
 				if ('size' in file) {
 					
 					totalSize = file.size/1024;
-					
+					alert(totalSize);
 				}
-				if (totalSize < 7001) {
+				if (totalSize < 7) {
 					
 					document.getElementById("msg").innerHTML = txt + "</div>";
 					document.getElementById("modalButton").click();
