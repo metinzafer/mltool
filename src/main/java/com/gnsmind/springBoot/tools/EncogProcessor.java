@@ -134,7 +134,7 @@ public class EncogProcessor {
 					}
 						
 					// Send any output to the console.
-					model.setReport(new ConsoleStatusReportable());
+					//model.setReport(new ConsoleStatusReportable());
 
 					// Now normalize the data. Encog will automatically determine
 					// the correct normalization
