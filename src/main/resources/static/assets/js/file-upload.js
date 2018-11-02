@@ -44,7 +44,7 @@ function sub() {
 				if ('size' in file) {
 					
 					totalSize = file.size/1024;
-					alert(totalSize);
+					//alert(totalSize);
 				}
 				if (totalSize < 7) {
 					
