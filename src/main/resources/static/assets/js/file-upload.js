@@ -46,7 +46,7 @@ function sub() {
 					totalSize = file.size/1024;
 					
 				}
-				if (totalSize < 50000) {
+				if (totalSize < 7001) {
 					
 					document.getElementById("msg").innerHTML = txt + "</div>";
 					document.getElementById("modalButton").click();
@@ -54,7 +54,7 @@ function sub() {
 					checkFilesNumber = true;
 				}else{
 					
-					alert("File size should be max. 50 MB!");
+					alert("File size should be max. 7 KB!");
 				}
 			}
 		} else {
