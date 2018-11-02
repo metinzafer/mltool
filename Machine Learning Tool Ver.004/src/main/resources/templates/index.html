@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Clasified">
+<meta name="generator" content="ADBOX">
+<link rel="stylesheet" href="/assets/css/bootstrap.min.css"
+	type="text/css">
+<link rel="stylesheet" href="/assets/css/bootstrap-select.min.css">
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="/assets/js/bootstrap-select.min.js"></script>
+<script type="text/javascript" src="/assets/js/main.js"></script>
+<script type="text/javascript" src="/assets/js/file-upload.js"></script>
+
+<!-- script type="text/javascript" src="/assets/js/bootstrap.min.js"></script-->
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript" th:inline="javascript">
+// Load google charts
+/*<![CDATA[*/
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+// Draw the chart and set the chart values
+function drawChart() {
+	
+  var data = google.visualization.arrayToDataTable([
+  ['Algorithm', 'Total Success Ratio'],
+  ['FNN', [[${session.FNN}]]],
+  ['SVM', [[${session.SVM}]]],
+  ['RBF', [[${session.RBF}]]],
+  ['NEAT', [[${session.NEAT}]]]
+  
+]);
+
+  // Optional; add a title and set the width and height of the chart
+  var options = {'title':'Algorithms Success Ratio For Correct Predictions', 'width':650, 'height':500};
+
+  // Display the chart inside the <div> element with id="piechart"
+  var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
+  /*]]>*/
+}
+</script>
+
+<title>ML Tool</title>
+<style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #f1f1f1;
+}
+
+#regForm {
+	background-color: #ffffff;
+	margin: 100px auto;
+	font-family: Raleway;
+	padding: 40px;
+	width: 70%;
+	min-width: 300px;
+}
+
+h1 {
+	text-align: center;
+}
+
+input {
+	padding: 10px;
+	width: 100%;
+	font-size: 17px;
+	font-family: Raleway;
+	border: 1px solid #aaaaaa;
+}
+
+/* Mark input boxes that gets an error on validation: */
+input.invalid {
+	background-color: #ffdddd;
+}
+
+/* Hide all steps by default: */
+.tab {
+	display: none;
+	text-align: center;
+	vertical-align: middle;
+}
+
+button {
+	background-color: #4CAF50;
+	color: #ffffff;
+	border: none;
+	padding: 10px 20px;
+	font-size: 17px;
+	font-family: Raleway;
+	cursor: pointer;
+}
+
+button:hover {
+	opacity: 0.8;
+}
+
+#prevBtn {
+	background-color: #bbbbbb;
+}
+
+/* Make circles that indicate the steps of the form: */
+.step {
+	height: 15px;
+	width: 15px;
+	margin: 0 2px;
+	background-color: #bbbbbb;
+	border: none;
+	border-radius: 50%;
+	display: inline-block;
+	opacity: 0.5;
+}
+
+.step.active {
+	opacity: 1;
+}
+
+/* Mark the steps that are finished and valid: */
+.step.finish {
+	background-color: #4CAF50;
+}
+
+/* The container */
+.containerRadio {
+	display: block;
+	position: relative;
+	padding-left: 35px;
+	margin-bottom: 12px;
+	cursor: pointer;
+	font-size: 15px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	text-align: center;
+	vertical-align: middle;
+	width: 100%;
+}
+
+/* Hide the browser's default radio button */
+.containerRadio input {
+	opacity: 0;
+	cursor: pointer;
+}
+
+/* Create a custom radio button */
+.checkmark {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 25px;
+	width: 25px;
+	background-color: #eee;
+	border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.containerRadio:hover input ~ .checkmark {
+	background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.containerRadio input:checked ~ .checkmark {
+	background-color: green;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark:after {
+	content: "";
+	position: absolute;
+	display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.containerRadio input:checked ~ .checkmark:after {
+	display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.containerRadio .checkmark:after {
+	top: 9px;
+	left: 9px;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: white;
+}
+
+.align-items-center {
+	align-items: center; /*Aligns vertically center */
+	justify-content: center; /*Aligns horizontally center */
+}
+</style>
+<body>
+	<div class="container">
+		<div class="panel panel-default">
+			<div class="panel-body" style="overflow-x: auto; text-align: center;">
+				<h1>
+					<a href="#" th:href="@{/}" style="text-decoration: none;">Machine
+						Learning Tool Ver. 001</a>
+				</h1>
+				<!-- One "tab" for each step in the form: -->
+				<div class="tab">
+					<hr>
+					<h2 style="color: gray;">CSV File Upload</h2>
+					<hr>
+					<form role="form" id="upload" action="#"
+						th:action="@{/file/upload(memberAdPhoto='true')}" method="POST"
+						name="picForm" enctype="multipart/form-data">
+						<fieldset>
+							<div class="btn btn-info btn-post" onclick="getFile()"
+								style="background-color: #F2C179; border: 0px;">
+								<span class="glyphicon glyphicon-cloud-upload"></span> <span
+									th:utext="#{label.label.upload}"></span>
+							</div>
+							<div style='height: 0px; width: 0px; overflow: hidden;'>
+								<input id="upfile" type="file" name="fileselect" value="upload"
+									onchange="sub()" multiple="multiple" />
+							</div>
+
+							<div th:if="${fileUploadMsg}">
+								<br>
+								<div class="alert alert-success alert-dismissable" role="alert"
+									id="success-alertPic">File has been uploaded..</div>
+							</div>
+
+							<div th:if="${fileUploadTotalNumMsg}">
+								<br>
+								<div class="alert alert-info" role="alert"
+									id="info-alertFileNum">You should upload only 1 file!</div>
+							</div>
+
+							<div th:if="${errorMessage}">
+								<br>
+								<div class="alert alert-danger" role="alert"
+									th:text="${errorMessage}" id="error"></div>
+							</div>
+
+							<div th:if="${errorMessageFileIsEmpty}">
+								<br>
+								<div class="alert alert-danger" role="alert" id="error">The
+									file is empty!</div>
+							</div>
+
+						</fieldset>
+					</form>
+					<!-- adUpdateModal -->
+					<div class="modal fade" id="adUpdateModal" role="dialog"
+						align="center">
+						<div class="modal-dialog">
+
+							<!-- Modal content-->
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">&times;</button>
+									<h4 class="modal-title">
+										<strong>File Info</strong>
+									</h4>
+								</div>
+								<div class="modal-body">
+									<p>
+										<span id="msg"></span>
+									</p>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal" id="picSubmit">OK</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<button type="button" class="btn btn-info btn-lg"
+						data-toggle="modal" data-target="#adUpdateModal"
+						style="display: none" id="modalButton"></button>
+					<button type="button" class="btn btn-info btn-lg"
+						data-toggle="modal" data-target="#adUpdateFileNoErrorModal"
+						style="display: none" id="modalButtonFileNoError"></button>
+					<button type="button" class="btn btn-info btn-lg"
+						data-toggle="modal" data-target="#adUpdateFileSizeErrorModal"
+						style="display: none" id="modalButtonFileSizeError"></button>
+					<button type="button" class="btn btn-info btn-lg"
+						data-toggle="modal" data-target="#adUpdateFileNoSelectErrorModal"
+						style="display: none" id="modalButtonSelectOneOrMoreFiles"></button>
+					<button type="button" class="btn btn-info btn-lg"
+						data-toggle="modal"
+						data-target="#adUpdateFileNotSupportedErrorModal"
+						style="display: none" id="modalButtonFilesPropertyIsNotSupported"></button>
+
+
+					<div th:if="${session.csvHeadersForMainTab!=null}">
+						<hr>
+						<h3>Headers</h3>
+						<hr>
+						<div style="overflow-x: auto;" align="center">
+							<form role="form" id="transform" action="#"
+								th:action="@{/transform}" method="GET" name="transformForm"
+								enctype="multipart/form-data">
+								<div class="panel panel-default" style="overflow-x: auto;"
+									align="center">
+									<div class="panel-body">
+										<table>
+											<!-- 
+									<tr align="center">
+										<td th:each="csvHeader : ${session.csvHeadersForMainTab}">
+											<input type="checkbox" name="attribute" th:value="${session.indexCounter++}" style="cursor:pointer;" alt="Transform" th:id="transform_ + ${csvHeader}">
+										</td>
+									</tr>
+									-->
+											<tr align="center">
+												<td th:each="csvHeader : ${session.csvHeadersForMainTab}"
+													th:value="${csvHeader}" th:text="${csvHeader}"
+													style="padding: 5px; vertical-align: middle; color: darkblue;">
+												</td>
+											</tr>
+											<tr align="center">
+												<td th:each="csvHeader : ${session.csvHeadersForMainTab}">
+													<hr>
+												</td>
+											</tr>
+											<tr align="center">
+												<td th:each="csvElement : ${session.csvElements}"
+													th:value="${csvElement}" th:text="${csvElement}"
+													style="padding: 5px; vertical-align: middle;"></td>
+											</tr>
+										</table>
+									</div>
+									<!-- 
+									<button type="submit" class="btn btn-info btn-lg" style="padding-bottom:15px;margin-bottom:15px;background-color: #F2C179;border-color: #F2C179;">
+										<span>Transform Attribute(s)</span>
+									</button>
+									 -->
+									<div th:if="${attrMsg}">
+										<br>
+										<div class="alert alert-success alert-dismissable"
+											role="alert" id="success-alertPic">The selected
+											attributes have been recorded to be transformed..</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<br>
+				<form role="form" id="set" action="#" th:action="@{/processMLTool}"
+					method="POST" name="form">
+					<div class="tab" align="center"
+						style="vertical-align: middle; padding-bottom: 10px;">
+						<hr>
+						<h2 style="color: gray;">Data Set Info</h2>
+						<hr>
+						<div class="row" align="center">
+							<div class="col-sm-6 text-center">
+								Set Column Info <strong>(Predictors -&gt; Data Type :
+									Continuous)</strong>
+								<div align="center">
+									<select class="form-control" style="height: 155px;"
+										name="predictors" th:if="${session!=null}" multiple>
+										<option class="subitem"
+											th:each="csvHeader : ${session.csvHeaders}"
+											th:value="${csvHeader}" th:text="${csvHeader}"></option>
+									</select>
+								</div>
+							</div>
+							<div class="col-sm-6  text-center">
+								Set Column Info <strong>(Response -&gt; Data Type :
+									Nominal)</strong>
+								<div align="center">
+									<select class="form-control" style="height: 155px;"
+										name="response" th:if="${session!=null}" multiple>
+										<option class="subitem"
+											th:each="csvHeader : ${session.csvHeaders}"
+											th:value="${csvHeader}" th:text="${csvHeader}"></option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="row" align="center" style="padding-top: 10px;">
+							<div class="col-sm-12 text-center">
+								Set Possible Outputs <strong>(Response)</strong>
+								<div align="center">
+									<textarea class="form-control" rows="4" cols="100%"
+										name="outputs" draggable="false" style="resize: none;"
+										placeholder="Sample : successful, failed, undefined"></textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab">
+						<hr>
+						<h2 style="color: gray;">Choose Algorithm</h2>
+						<hr>
+						<div class="row">
+							<div class="col-sm-4" align="right"></div>
+							<div class="col-sm-2" align="right">
+								<input type="checkbox" checked="checked" name="checkbox"
+									value="FNN" />
+							</div>
+							<div class="col-sm-2">
+								<label class="form-check-label">FEED FORWARD Neural
+									NETWORK</label>
+							</div>
+							<div class="col-sm-4" align="right"></div>
+						</div>
+						<div class="row">
+							<div class="col-sm-4" align="right"></div>
+
+							<div class="col-sm-2" align="right">
+								<input type="checkbox" name="checkbox" value="SVM"
+									class="form-check-input" checked="checked"/>
+							</div>
+							<div class="col-sm-2">
+
+								<label class="form-check-label">SVM</label>
+							</div>
+							<div class="col-sm-4" align="right"></div>
+
+						</div>
+						<div class="row">
+							<div class="col-sm-4" align="right"></div>
+
+							<div class="col-sm-2" align="right">
+								<input type="checkbox" name="checkbox" value="RBF"
+									class="form-check-input" checked="checked">
+							</div>
+							<div class="col-sm-2">
+
+								<label class="form-check-label">RBF Neural NETWORK</label>
+							</div>
+							<div class="col-sm-4" align="right"></div>
+
+						</div>
+						<div class="row">
+							<div class="col-sm-4" align="right"></div>
+
+							<div class="col-sm-2" align="right">
+								<input type="checkbox" name="checkbox" value="NEAT"
+									class="form-check-input" checked="checked"/>
+							</div>
+							<div class="col-sm-2">
+
+								<label class="form-check-label">NEAT Neural NETWORK</label>
+							</div>
+							<div class="col-sm-4" align="right"></div>
+
+						</div>
+						<!-- 
+						<div class="row">
+							<div class="col-sm-4" align="right"></div>
+
+							<div class="col-sm-2" align="right">
+								<input type="checkbox" name="checkbox" value="PNN"
+									class="form-check-input" />
+							</div>
+							<div class="col-sm-2">
+
+								<label class="form-check-label">Probabilistic Neural
+									Network</label>
+							</div>
+							<div class="col-sm-4" align="right"></div>
+
+						</div>
+						-->
+						<hr>
+						<h4>Fold Number</h4>
+						<select class="" id="foldNo" name="foldNo"
+							style="width: 40px; cursor: pointer; border-radius: 50px;">
+							<option>1</option>
+							<option>2</option>
+							<option>3</option>
+							<option>4</option>
+							<option>5</option>
+							<option>6</option>
+							<option>7</option>
+							<option>8</option>
+							<option>9</option>
+							<option>10</option>
+						</select>
+					</div>
+					<br>
+					<div style="overflow: auto;">
+						<div style="float: right;">
+							<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+							<button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+						</div>
+					</div>
+					<!-- Circles which indicates the steps of the form: -->
+					<div style="text-align: center; margin-top: 40px;">
+						<span class="step"></span> <span class="step"></span> <span
+							class="step"></span> <span class="step"></span>
+					</div>
+				</form>
+				<div class="panel panel-default" style="overflow-x: auto;"
+					align="center" th:if="${session.statistics!=null}">
+					<div class="panel-body">
+						<table class="text-center"
+							style="width: 100%; text-align: center;">
+							<thead>
+								<tr align="center">
+									<th><h2 style="text-align: center">Prediction
+											Statistics</h2></th>
+								</tr>
+							</thead>
+							<tbody id="memberAdsTable">
+								<tr th:each="statistic: ${session.statistics}"
+									th:unless="${session == null}">
+									<td>
+										<div>
+											<div class="row" align="center">
+												<div class="col-sm-12 text-center">
+													<p th:text="${statistic.result}"></p>
+												</div>
+												<h4>
+													<span> <a data-toggle="collapse"
+														th:attr="data-target='#dash_' + ${statistic.algorithm}"
+														style="cursor: pointer; color: silver; text-decoration: none;">
+														<span th:if="${session.bestRatio == statistic.totalRatio}" class="glyphicon glyphicon-star" style="color:#FAEE26"></span>
+														<span th:if="${session.bestRatio == statistic.totalRatio}" class="glyphicon glyphicon-star" style="color:#FAEE26"></span>
+														<span th:if="${session.bestRatio == statistic.totalRatio}" class="glyphicon glyphicon-star" style="color:#FAEE26"></span>
+														&nbsp;	
+														<span class="glyphicon glyphicon-stats"></span> <span>Details</span>
+													</a>
+													</span>
+												</h4>
+												<div class="text-center collapse"
+													th:id="'dash_' + ${statistic.algorithm}"
+													th:if="session.result!=null">
+													<hr>
+													<p th:utext="${statistic.predResult}"
+														style="word-wrap: break-word;"></p>
+													<div style="background-color: #F9F8F2;">
+														<div class="row" align="center">
+															<div class="col-sm-4 text-center">
+																<h3>Training Error</h3>
+																<p th:text="${statistic.trainingError}"></p>
+															</div>
+															<div class="col-sm-4 text-center">
+																<h3>Validation Error</h3>
+																<p th:text="${statistic.validationError}"></p>
+															</div>
+															<div class="col-sm-4 text-center">
+																<h3>Final Model</h3>
+																<p th:text="${statistic.finalModel}"></p>
+															</div>
+														</div>
+														<hr>
+														<div align="center">
+															<h3>Helper</h3>
+															<p th:text="${statistic.helper}"></p>
+														</div>
+														<br>
+													</div>
+												</div>
+											</div>
+										</div>
+										<hr>
+									</td>
+								</tr>
+						</table>
+					</div>
+				</div>
+				<div id="chart_div" style="width: 100%; height: 500px;background-color: #F9F8F2" align="center" th:if="${session.statistics!=null}"></div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var currentTab = 0; // Current tab is set to be the first tab (0)
+	showTab(currentTab); // Display the crurrent tab
+
+	function showTab(n) {
+		// This function will display the specified tab of the form...
+		var x = document.getElementsByClassName("tab");
+		x[n].style.display = "block";
+		//... and fix the Previous/Next buttons:
+		if (n == 0) {
+			document.getElementById("prevBtn").style.display = "none";
+		} else {
+			document.getElementById("prevBtn").style.display = "inline";
+		}
+		if (n == (x.length - 1)) {
+
+			document.getElementById("nextBtn").innerHTML = "Process";
+		} else {
+			document.getElementById("nextBtn").innerHTML = "Next";
+		}
+		//... and run a function that will display the correct step indicator:
+		fixStepIndicator(n)
+	}
+
+	function nextPrev(n) {
+		// This function will figure out which tab to display
+		var x = document.getElementsByClassName("tab");
+		// Exit the function if any field in the current tab is invalid:
+		iterateForm();
+		// Hide the current tab:
+		x[currentTab].style.display = "none";
+		// Increase or decrease the current tab by 1:
+		currentTab = currentTab + n;
+		// if you have reached the end of the form...
+		if (currentTab >= x.length) {
+			// ... the form gets submitted:
+			document.form.submit();
+			return false;
+		}
+		// Otherwise, display the correct tab:
+		showTab(currentTab);
+	}
+
+	function iterateForm() {
+
+		var valid = true;
+		document.getElementsByClassName("step")[currentTab].className += " finish";
+		return valid; // return the valid status
+	}
+
+	function fixStepIndicator(n) {
+		// This function removes the "active" class of all steps...
+		var i, x = document.getElementsByClassName("step");
+		for (i = 0; i < x.length; i++) {
+			x[i].className = x[i].className.replace(" active", "");
+		}
+		//... and adds the "active" class on the current step:
+		x[n].className += " active";
+	}
+</script>
+
+
+</html>
