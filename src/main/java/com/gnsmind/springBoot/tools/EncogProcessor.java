@@ -34,47 +34,93 @@ public class EncogProcessor {
 	}
 
 	public synchronized void getMapping(String fileName, String[] predictors, String[] response, String[] algrthm,
-			HttpSession session, String[] outputs, ModelAndView modelAndView, int foldNo) {
+			HttpSession session, String[] outputs, ModelAndView modelAndView, int foldNo, int predictionType, String[] repeated, String[] repeatedValues) {
 		try {
 			File file = new File(fileName);
 
 			VersatileDataSource source = null;
 			String[] predictor = null, responseVal = null;
-			int index = 0, respIndex = 0;
+			int index = 0, respIndex = 0, repeatedValuesArrayIndex = 0;
 			double tE = 0.0, vE = 0.0, max = 0.0;
 			String modelName = "";
-
-			// Define the format of the data file.
-			// This area will change, depending on the columns and
-			// format of the file that you are trying to model.
+			CSVFormat format = new CSVFormat('.',','); // decimal point and comma separator
+					
 			if (file.exists()) {
-
-				source = new CSVDataSource(file, true, CSVFormat.DECIMAL_POINT);
-				VersatileMLDataSet data = new VersatileMLDataSet(source);
+				
+				// Define the format of the data file.
+				// This area will change, depending on the columns and
+				// format of the file that you are trying to model.
+				
+				VersatileMLDataSet data = null;
 				List<Integer> indexList = new ArrayList<Integer>();
+				
+				switch (predictionType) {
+				
+				//classification
+				case 0:
+					
+					source = new CSVDataSource(file, true, CSVFormat.DECIMAL_POINT);
+					data = new VersatileMLDataSet(source);
+					break;
+					
+				//regression	
+				case 1:
 
+					source = new CSVDataSource(file, true, format);
+					data = new VersatileMLDataSet(source);
+					data.getNormHelper().setFormat(format);
+					break;
+				default:
+					break;
+				}
+				List<ColumnDefinition> columns = new ArrayList<ColumnDefinition>();
+				
 				for (int i = 0; i != predictors.length; i++) {
-
+					
 					predictor = predictors[i].split(" ");
 					if (predictor.length == 2) {
 
 						index = Integer.valueOf((predictor[1].replace("(", "")).replace(")", "").trim());
-						data.defineSourceColumn(predictor[0].trim(), index, ColumnType.continuous);
+						
+						if(repeated!=null && repeated.length>0 && Arrays.asList(repeated).contains(predictor[0].trim())) {
+							
+							String[] repeatArray = repeatedValues[repeatedValuesArrayIndex].split(",");
+							
+							ColumnDefinition col = data.defineSourceColumn(predictor[0].trim(), index, ColumnType.ordinal);
+							col.defineClass(repeatArray);
+							columns.add(col);
+							repeatedValuesArrayIndex++;
+						}else {
+							
+							data.defineSourceColumn(predictor[0].trim(), index, ColumnType.continuous);
+						}
 						indexList.add(index);
 					} else if (predictor.length > 2) {
 
 						index = Integer.valueOf((predictor[2].replace("(", "")).replace(")", "").trim());
+						
 						data.defineSourceColumn((predictor[0] + " " + predictor[1]).trim(), index,
 								ColumnType.continuous);
+						
 						indexList.add(index);
 					}
 				}
+				
 				responseVal = response[0].split(" ");
 				respIndex = Integer.valueOf((responseVal[1].replace("(", "")).replace(")", "").trim());
+				ColumnDefinition outputColumn = null;
 				// Define the column that we are trying to predict.
-				ColumnDefinition outputColumn = data.defineSourceColumn(responseVal[0].trim(), respIndex,
+				if(predictionType==0) {
+					
+					outputColumn = data.defineSourceColumn(responseVal[0].trim(), respIndex,
 						ColumnType.nominal);
+				}else {
+					
+					outputColumn = data.defineSourceColumn(responseVal[0].trim(), respIndex,
+							ColumnType.continuous);
+				}
 
+				
 				// Analyze the data, determine the min/max/mean/sd of every
 				// column.
 
@@ -181,8 +227,15 @@ public class EncogProcessor {
 					// class. After you train, you can save the NormalizationHelper
 					// to later
 					// normalize and denormalize your data.
-					ReadCSV csv = new ReadCSV(file, true, CSVFormat.DECIMAL_POINT);
-					String[] line = new String[4];
+					ReadCSV csv = null;
+					if(predictionType==0) {
+						
+						csv = new ReadCSV(file, true, CSVFormat.DECIMAL_POINT);
+					}else {
+						
+						csv = new ReadCSV(file, true, format);
+					}
+					String[] line = new String[indexList.size()];
 					MLData input = helper.allocateInputVector();
 					double correctPredictionNumTotal = 0.0, correctPredictionRatioTotal = 0.0, numTotal = 0.0;
 
@@ -220,42 +273,54 @@ public class EncogProcessor {
 						predResult.append(" -> correct: ");
 						predResult.append("<strong>" + correct + "</strong>");
 						predResult.append("<br>");
+						
+						if(predictionType==0) {
 
-						if (elementChosen.equals(correct)) {
-
-							correctPredictionNumTotal++;
+							if (elementChosen.equals(correct)) {
+	
+								correctPredictionNumTotal++;
+							}
+						}else {
+							
+							if ((((Double.valueOf(elementChosen) + 2.0) >= Double.valueOf(correct)) && ((Double.valueOf(elementChosen) - 2.0) <= Double.valueOf(correct))) || (Double.valueOf(elementChosen) == Double.valueOf(correct))) {
+								
+								correctPredictionNumTotal++;
+							}
 						}
-
-						for (int i = 0; i != outputs.length; i++) {
-
-							String out = outputs[i].trim();
-
-							if (elementChosen.equals(out)) {
-								if (elementChosen.equals(correct)) {
-
-									Double num = correctPredictionNumOutput.get(out);
-									num++;
-									correctPredictionNumOutput.put(out, num);
+						if(outputs!=null && outputs.length>0) {
+							
+							for (int i = 0; i != outputs.length; i++) {
+	
+								String out = outputs[i].trim();
+	
+								if (elementChosen.equals(out)) {
+									if (elementChosen.equals(correct)) {
+	
+										Double num = correctPredictionNumOutput.get(out);
+										num++;
+										correctPredictionNumOutput.put(out, num);
+									}
+									numTotal = correctPredictionNumOutputTotal.get(out);
+									numTotal++;
+									correctPredictionNumOutputTotal.put(out, numTotal);
 								}
-								numTotal = correctPredictionNumOutputTotal.get(out);
-								numTotal++;
-								correctPredictionNumOutputTotal.put(out, numTotal);
 							}
 						}
 
 						lineCounter++;
 					}
-					//session.setAttribute("result", predResult);
-					for (int i = 0; i != outputs.length; i++) {
+					if(outputs!=null && outputs.length>0) {
 
-						String out = outputs[i].trim();
-
-						Double res = (double) Math
-								.round((correctPredictionNumOutput.get(out) / correctPredictionNumOutputTotal.get(out))
-										* 100.0);
-						correctPredictionNumOutputRatioTotal.put(out, res);
+						for (int i = 0; i != outputs.length; i++) {
+	
+							String out = outputs[i].trim();
+	
+							Double res = (double) Math
+									.round((correctPredictionNumOutput.get(out) / correctPredictionNumOutputTotal.get(out))
+											* 100.0);
+							correctPredictionNumOutputRatioTotal.put(out, res);
+						}
 					}
-
 					correctPredictionRatioTotal = Math.round((correctPredictionNumTotal / lineCounter) * 100.0);
 
 					List<String> result = new ArrayList<String>();
@@ -263,13 +328,16 @@ public class EncogProcessor {
 					// System.out.println("The ratio of correct prediction Total : " +
 					// correctPredictionRatioTotal + "%");
 					result.add("(" + algrthm[k] + ") The ratio of correct prediction TOTAL      : " + correctPredictionRatioTotal + "%");
-					for (int i = 0; i != outputs.length; i++) {
+					if(outputs!=null && outputs.length>0) {
 
-						String out = outputs[i].trim();
-						// System.out.println("The ratio of correct prediction " + out + " : " +
-						// correctPredictionNumOutputRatioTotal.get(out) + "%");
-						result.add("The ratio of correct prediction " + out + "     : "
-								+ correctPredictionNumOutputRatioTotal.get(out) + "%");
+						for (int i = 0; i != outputs.length; i++) {
+	
+							String out = outputs[i].trim();
+							// System.out.println("The ratio of correct prediction " + out + " : " +
+							// correctPredictionNumOutputRatioTotal.get(out) + "%");
+							result.add("The ratio of correct prediction " + out + "     : "
+									+ correctPredictionNumOutputRatioTotal.get(out) + "%");
+						}
 					}
 					// System.out.println("==================================================");
 					resultsList.add(result);

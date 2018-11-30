@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/assets/css/bootstrap.min.css"
 	type="text/css">
 <link rel="stylesheet" href="/assets/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="/assets/css/mltool-main.css">
 
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -51,173 +52,42 @@ function drawChart() {
   chart.draw(data, options);
   /*]]>*/
 }
+function show(id, value) {
+    document.getElementById(id).style.display = value ? 'block' : 'none';
+}
+
+function onReady(callback) {
+    var intervalID = window.setInterval(checkReady, 1000);
+
+    function checkReady() {
+        if (document.getElementsByTagName('body')[0] !== undefined) {
+            window.clearInterval(intervalID);
+            callback.call(this);
+        }
+    }
+}
+
+onReady(function () {
+    show('content', true);
+    show('loading', false);
+});
+
 </script>
 
 <title>ML Tool</title>
-<style>
-* {
-	box-sizing: border-box;
-}
-
-body {
-	background-color: #f1f1f1;
-}
-
-#regForm {
-	background-color: #ffffff;
-	margin: 100px auto;
-	font-family: Raleway;
-	padding: 40px;
-	width: 70%;
-	min-width: 300px;
-}
-
-h1 {
-	text-align: center;
-}
-
-input {
-	padding: 10px;
-	width: 100%;
-	font-size: 17px;
-	font-family: Raleway;
-	border: 1px solid #aaaaaa;
-}
-
-/* Mark input boxes that gets an error on validation: */
-input.invalid {
-	background-color: #ffdddd;
-}
-
-/* Hide all steps by default: */
-.tab {
-	display: none;
-	text-align: center;
-	vertical-align: middle;
-}
-
-button {
-	background-color: #4CAF50;
-	color: #ffffff;
-	border: none;
-	padding: 10px 20px;
-	font-size: 17px;
-	font-family: Raleway;
-	cursor: pointer;
-}
-
-button:hover {
-	opacity: 0.8;
-}
-
-#prevBtn {
-	background-color: #bbbbbb;
-}
-
-/* Make circles that indicate the steps of the form: */
-.step {
-	height: 15px;
-	width: 15px;
-	margin: 0 2px;
-	background-color: #bbbbbb;
-	border: none;
-	border-radius: 50%;
-	display: inline-block;
-	opacity: 0.5;
-}
-
-.step.active {
-	opacity: 1;
-}
-
-/* Mark the steps that are finished and valid: */
-.step.finish {
-	background-color: #4CAF50;
-}
-
-/* The container */
-.containerRadio {
-	display: block;
-	position: relative;
-	padding-left: 35px;
-	margin-bottom: 12px;
-	cursor: pointer;
-	font-size: 15px;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	text-align: center;
-	vertical-align: middle;
-	width: 100%;
-}
-
-/* Hide the browser's default radio button */
-.containerRadio input {
-	opacity: 0;
-	cursor: pointer;
-}
-
-/* Create a custom radio button */
-.checkmark {
-	position: absolute;
-	top: 0;
-	left: 0;
-	height: 25px;
-	width: 25px;
-	background-color: #eee;
-	border-radius: 50%;
-}
-
-/* On mouse-over, add a grey background color */
-.containerRadio:hover input ~ .checkmark {
-	background-color: #ccc;
-}
-
-/* When the radio button is checked, add a blue background */
-.containerRadio input:checked ~ .checkmark {
-	background-color: green;
-}
-
-/* Create the indicator (the dot/circle - hidden when not checked) */
-.checkmark:after {
-	content: "";
-	position: absolute;
-	display: none;
-}
-
-/* Show the indicator (dot/circle) when checked */
-.containerRadio input:checked ~ .checkmark:after {
-	display: block;
-}
-
-/* Style the indicator (dot/circle) */
-.containerRadio .checkmark:after {
-	top: 9px;
-	left: 9px;
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background: white;
-}
-
-.align-items-center {
-	align-items: center; /*Aligns vertically center */
-	justify-content: center; /*Aligns horizontally center */
-}
-</style>
-<body>
+<body id="content">
+	<div id="loading"></div>
 	<div class="container">
 		<div class="panel panel-default">
 			<div class="panel-body" style="overflow-x: auto; text-align: center;">
-				<h1>
+				<h2>
 					<a href="#" th:href="@{/}" style="text-decoration: none;">Machine
-						Learning Tool Ver. 002</a>
-				</h1>
+						Learning Tool Ver. 003</a>
+				</h2>
 				<!-- One "tab" for each step in the form: -->
 				<div class="tab">
 					<hr>
-					<h2 style="color: gray;">CSV File Upload</h2>
+					<h4 style="color: gray;">CSV Data File Upload</h4>
 					<hr>
 					<form role="form" id="upload" action="#"
 						th:action="@{/file/upload(userFile='true')}" method="POST"
@@ -228,6 +98,8 @@ button:hover {
 								<span class="glyphicon glyphicon-cloud-upload"></span> <span
 									th:utext="#{label.label.upload}"></span>
 							</div>
+							<hr>
+							<span><a href="https://github.com/metinzafer/mltool/tree/master/Sample%20Data%20Sets" style="cursor:pointer;" target="blank"><strong>Sample Data Sets</strong></a></span>	
 							<div style='height: 0px; width: 0px; overflow: hidden;'>
 								<input id="upfile" type="file" name="fileselect" value="upload"
 									onchange="sub()" multiple="multiple" />
@@ -357,7 +229,7 @@ button:hover {
 					</div>
 				</div>
 				<br>
-				<form role="form" id="set" action="#" th:action="@{/processMLTool}"
+				<form role="form" id="set" action="#" th:action="@{/processMLTool}" 
 					method="POST" name="form">
 					<div class="tab" align="center"
 						style="vertical-align: middle; padding-bottom: 10px;">
@@ -365,7 +237,7 @@ button:hover {
 						<h2 style="color: gray;">Data Set Info</h2>
 						<hr>
 						<div class="row" align="center">
-							<div class="col-sm-6 text-center">
+							<div class="col-sm-4 text-center">
 								Set Column Info <strong>(Predictors -&gt; Data Type :
 									Continuous)</strong>
 								<div align="center">
@@ -377,16 +249,55 @@ button:hover {
 									</select>
 								</div>
 							</div>
-							<div class="col-sm-6  text-center">
+							<div class="col-sm-4  text-center">
 								Set Column Info <strong>(Response -&gt; Data Type :
 									Nominal)</strong>
-								<div align="center">
+								<div align="center" style="padding-top: 20px;">
 									<select class="form-control" style="height: 155px;"
 										name="response" th:if="${session!=null}" multiple>
 										<option class="subitem"
 											th:each="csvHeader : ${session.csvHeaders}"
 											th:value="${csvHeader}" th:text="${csvHeader}"></option>
 									</select>
+								</div>
+							</div>
+							<div class="col-sm-4  text-center">
+								Set Column Info With Repeated Values for Regression <strong>(Data Type :
+									Ordinal)</strong>
+								<div align="center">
+									<select class="form-control" style="height: 155px;"
+										name="repeated" th:if="${session!=null}" multiple>
+										<option class="subitem"
+											th:each="csvHeader : ${session.csvHeaders}"
+											th:value="${csvHeader}" th:text="${csvHeader}"></option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<hr>
+						<div class="row">
+							<div class="col-sm-4" align="right">Task Type:</div>
+							<div class="col-sm-2" align="center">
+								
+								<label class="form-check-label">Classification</label>
+								<input type="radio" name="predictionType"
+									value="0" style="cursor:pointer;"/>
+							</div>
+							<div class="col-sm-2" align="center">
+								<label class="form-check-label">Regression</label>
+								<input type="radio" checked="checked" name="predictionType"
+									value="1" style="cursor:pointer;"/>
+							</div>
+							<div class="col-sm-4"></div>
+						</div>
+						<br>
+						<div class="row" align="center" style="padding-top: 10px;">
+							<div class="col-sm-12 text-center">
+								Set Repeated Values for Regression <strong>(Nominal Data -&gt; *Data set order should be same with headers)</strong>
+								<div align="center">
+									<textarea class="form-control" rows="4" cols="100%"
+										name="repeatedValues" draggable="false" style="resize: none;"
+										placeholder="Sample : 33, 34, 35, 36 # 15, 24, 25"></textarea>
 								</div>
 							</div>
 						</div>
@@ -476,7 +387,7 @@ button:hover {
 							<div class="col-sm-4" align="right"></div>
 
 						</div>
-						-->
+						 -->
 						<hr>
 						<h4>Fold Number</h4>
 						<select class="" id="foldNo" name="foldNo"
@@ -617,6 +528,7 @@ button:hover {
 		if (currentTab >= x.length) {
 			// ... the form gets submitted:
 			document.form.submit();
+			show('loading', true);
 			return false;
 		}
 		// Otherwise, display the correct tab:

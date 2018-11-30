@@ -74,17 +74,31 @@ public class MainController {
 		
 			session = request.getSession();
 		}
-		String[] predictors = null, response = null, outputs = null, algrthm = null;
+		String[] predictors = null, response = null, outputs = null, algrthm = null, repeated = null, repeatedValues = null;
 		String fileName = "";
-		int foldNo = 0;
+		int foldNo = 0, predictionType = 0;
 		predictors = request.getParameterValues("predictors"); 
 		response = request.getParameterValues("response");
 		algrthm = request.getParameterValues("checkbox");
 		foldNo = Integer.valueOf(request.getParameter("foldNo"));
+		predictionType = Integer.valueOf(request.getParameter("predictionType"));
 		
-		if(request.getParameter("outputs")!=null){
+		if(request.getParameter("outputs")!=null && !request.getParameter("outputs").isEmpty()){
 		
 			outputs = request.getParameter("outputs").split(",");
+		}
+		if(request.getParameter("repeatedValues")!=null && !request.getParameter("repeatedValues").isEmpty()){
+			
+			
+			repeatedValues = request.getParameter("repeatedValues").trim().split("#");
+		}
+		if(request.getParameter("repeated")!=null && !request.getParameter("repeated").isEmpty()){
+			
+			repeated = request.getParameterValues("repeated");
+			for(int i=0;i!=repeated.length;i++) {
+				
+				repeated[i] = repeated[i].substring(0, repeated[i].indexOf("(")).trim();
+			}
 		}
 		if(session.getAttribute("fileName")!=null){
 		
@@ -95,7 +109,7 @@ public class MainController {
 			if(!fileName.equals("")){
 				
 				EncogProcessor ep = new EncogProcessor();
-				ep.getMapping(fileName, predictors, response, algrthm, session, outputs, modelAndView, foldNo);
+				ep.getMapping(fileName, predictors, response, algrthm, session, outputs, modelAndView, foldNo, predictionType, repeated, repeatedValues);
 			}else{
 				
 				session.setAttribute("processMsg", "No CSV file found!");

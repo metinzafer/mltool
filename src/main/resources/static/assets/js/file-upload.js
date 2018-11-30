@@ -9,6 +9,7 @@ function escapeTags(str) {
 
 function sub() {
 	
+	show('loading', true);
 	var validFileExtension = ".csv"; 
 	try {
 
