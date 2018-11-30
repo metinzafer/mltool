@@ -3,3 +3,5 @@ kick-starter => failed,canceled,successful,live,undefined,suspended
 Iris => Iris-virginica,Iris-versicolor,Iris-setosa
 
 Cuse => yes,no
+
+auto-mpg (repeated values) => 3,4,5,6,8#70,71,72,73,74,75,76,77,78,79,80,81,82
