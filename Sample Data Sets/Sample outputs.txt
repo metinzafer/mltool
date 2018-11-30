@@ -1,5 +1,5 @@
-failed,canceled,successful,live,undefined,suspended
+kick-starter => failed,canceled,successful,live,undefined,suspended
 
-Iris-virginica,Iris-versicolor,Iris-setosa
+Iris => Iris-virginica,Iris-versicolor,Iris-setosa
 
-yes,no
+Cuse => yes,no
