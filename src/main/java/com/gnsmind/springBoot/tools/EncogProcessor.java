@@ -243,16 +243,18 @@ public class EncogProcessor {
 					HashMap<String, Double> correctPredictionNumOutput = new HashMap<String, Double>();
 					HashMap<String, Double> correctPredictionNumOutputTotal = new HashMap<String, Double>();
 					HashMap<String, Double> correctPredictionNumOutputRatioTotal = new HashMap<String, Double>();
-
-					for (int i = 0; i != outputs.length; i++) {
-
-						String output = outputs[i].trim();
-						predictionsTable.put(output, 0.0);
-						correctPredictionNumOutput.put(output, 0.0);
-						correctPredictionNumOutputTotal.put(output, 0.0);
-						correctPredictionNumOutputRatioTotal.put(output, 0.0);
+					
+					if(outputs!=null && outputs.length>0) {
+						
+						for (int i = 0; i != outputs.length; i++) {
+	
+							String output = outputs[i].trim();
+							predictionsTable.put(output, 0.0);
+							correctPredictionNumOutput.put(output, 0.0);
+							correctPredictionNumOutputTotal.put(output, 0.0);
+							correctPredictionNumOutputRatioTotal.put(output, 0.0);
+						}
 					}
-
 					int lineCounter = 0;
 					StringBuilder predResult = new StringBuilder();
 					while (csv.next()) {
