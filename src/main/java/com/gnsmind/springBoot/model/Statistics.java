@@ -12,6 +12,7 @@ public class Statistics {
 	private String finalModel = "";
 	private double totalRatio = 0.0;
 	private String helper;
+	private double rmse;
 	
 	public Statistics() {
 		super();
@@ -94,6 +95,15 @@ public class Statistics {
 
 	public void setHelper(String helper) {
 		this.helper = helper;
+	}
+	
+	
+	public double getRmse() {
+		return rmse;
+	}
+
+	public void setRmse(double rmse) {
+		this.rmse = rmse;
 	}
 
 	@Override

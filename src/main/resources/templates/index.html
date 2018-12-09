@@ -392,7 +392,6 @@ onReady(function () {
 						<h4>Fold Number</h4>
 						<select class="" id="foldNo" name="foldNo"
 							style="width: 40px; cursor: pointer; border-radius: 50px;">
-							<option>1</option>
 							<option>2</option>
 							<option>3</option>
 							<option>4</option>
@@ -444,6 +443,10 @@ onReady(function () {
 														<span th:if="${session.bestRatio == statistic.totalRatio}" class="glyphicon glyphicon-star" style="color:#FAEE26"></span>
 														<span th:if="${session.bestRatio == statistic.totalRatio}" class="glyphicon glyphicon-star" style="color:#FAEE26"></span>
 														<span th:if="${session.bestRatio == statistic.totalRatio}" class="glyphicon glyphicon-star" style="color:#FAEE26"></span>
+														
+														<span th:if="${session.bestRatio == statistic.rmse}" class="glyphicon glyphicon-star" style="color:#FAEE26"></span>
+														<span th:if="${session.bestRatio == statistic.rmse}" class="glyphicon glyphicon-star" style="color:#FAEE26"></span>
+														<span th:if="${session.bestRatio == statistic.rmse}" class="glyphicon glyphicon-star" style="color:#FAEE26"></span>
 														&nbsp;	
 														<span class="glyphicon glyphicon-stats"></span> <span>Details</span>
 													</a>
@@ -457,15 +460,19 @@ onReady(function () {
 														style="word-wrap: break-word;"></p>
 													<div style="background-color: #F9F8F2;">
 														<div class="row" align="center">
-															<div class="col-sm-4 text-center">
+															<div class="col-sm-3 text-center">
 																<h3>Training Error</h3>
 																<p th:text="${statistic.trainingError}"></p>
 															</div>
-															<div class="col-sm-4 text-center">
+															<div class="col-sm-3 text-center">
 																<h3>Validation Error</h3>
 																<p th:text="${statistic.validationError}"></p>
 															</div>
-															<div class="col-sm-4 text-center">
+															<div class="col-sm-3 text-center">
+																<h3>RMSE For Regression</h3>
+																<p th:text="${statistic.rmse}"></p>
+															</div>
+															<div class="col-sm-3 text-center">
 																<h3>Final Model</h3>
 																<p th:text="${statistic.finalModel}"></p>
 															</div>

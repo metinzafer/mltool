@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -41,10 +42,10 @@ public class EncogProcessor {
 			VersatileDataSource source = null;
 			String[] predictor = null, responseVal = null;
 			int index = 0, respIndex = 0, repeatedValuesArrayIndex = 0;
-			double tE = 0.0, vE = 0.0, max = 0.0;
+			double tE = 0.0, vE = 0.0, max = 0.0, maxForReg = 10.0, rmse = 0.0, rmseTotal = 0.0;
 			String modelName = "";
 			CSVFormat format = new CSVFormat('.',','); // decimal point and comma separator
-					
+			
 			if (file.exists()) {
 				
 				// Define the format of the data file.
@@ -287,6 +288,7 @@ public class EncogProcessor {
 							if ((((Double.valueOf(elementChosen) + 2.0) >= Double.valueOf(correct)) && ((Double.valueOf(elementChosen) - 2.0) <= Double.valueOf(correct))) || (Double.valueOf(elementChosen) == Double.valueOf(correct))) {
 								
 								correctPredictionNumTotal++;
+								rmseTotal = Math.pow((Double.valueOf(elementChosen) - Double.valueOf(correct)), 2);
 							}
 						}
 						if(outputs!=null && outputs.length>0) {
@@ -311,6 +313,11 @@ public class EncogProcessor {
 
 						lineCounter++;
 					}
+					if(predictionType==1) 
+						rmse = Math.sqrt(rmseTotal/lineCounter);
+					else
+						rmse = 0.0;
+					
 					if(outputs!=null && outputs.length>0) {
 
 						for (int i = 0; i != outputs.length; i++) {
@@ -351,12 +358,18 @@ public class EncogProcessor {
 					st.setFinalModel(modelName);
 					st.setTotalRatio(correctPredictionRatioTotal);
 					st.setHelper(helper.toString());
+					st.setRmse(rmse);
 					stList.add(st);
 					st = null;
-					if(correctPredictionRatioTotal > max) {
+					
+					if(predictionType == 0 && correctPredictionRatioTotal > max) {
 					
 						max = correctPredictionRatioTotal;
 						session.setAttribute("bestRatio", max);
+					}else if(predictionType == 1 && rmse < maxForReg){
+						
+						maxForReg = rmse;
+						session.setAttribute("bestRatio", maxForReg);
 					}
 					session.setAttribute(algrthm[k], correctPredictionRatioTotal);
 				}
