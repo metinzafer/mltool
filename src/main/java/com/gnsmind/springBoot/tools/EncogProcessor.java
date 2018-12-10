@@ -258,6 +258,13 @@ public class EncogProcessor {
 					}
 					int lineCounter = 0;
 					StringBuilder predResult = new StringBuilder();
+					predResult.append("<span><table style=\"width:100%;border-style: solid;" + 
+							"    border-color: #957142;\">");
+					predResult.append("<tr style=\"width:100%;background-color:#957142;color:white;\">" + 
+							"    <th>Data Row</th>" + 
+							"    <th>Predicted</th>" + 
+							"    <th>Correct (Original Data)</th>" + 
+							"  </tr>");
 					while (csv.next()) {
 
 						for (int i = 0; i != indexList.size(); i++) {
@@ -269,19 +276,28 @@ public class EncogProcessor {
 						MLData output = bestMethod.compute(input);
 						String elementChosen = helper.denormalizeOutputVectorToString(output)[0];
 
+						predResult.append("<tr style=\"width:100%;border-style: solid;border-color: #957142;\"><td>");
 						predResult.append(Arrays.toString(line));
-						predResult.append(" -> predicted: ");
-						predResult.append("<strong>" + elementChosen + "</strong>");
-						predResult.append("  ");
-						predResult.append(" -> correct: ");
-						predResult.append("<strong>" + correct + "</strong>");
-						predResult.append("<br>");
+						predResult.append("</td><td>");
 						
 						if(predictionType==0) {
 
 							if (elementChosen.equals(correct)) {
 	
 								correctPredictionNumTotal++;
+								
+								predResult.append("<strong>" + elementChosen + "</strong>");
+								predResult.append("</td><td>");
+								predResult.append("<strong>" + correct + "</strong>");
+								predResult.append("</td></tr>");
+								
+							}else {
+								
+								predResult.append("<strong style=\"background-color:yellow;color:red;\">" + elementChosen + "</strong>");
+								predResult.append("</td><td>");
+								predResult.append("<strong>" + correct + "</strong>");
+								predResult.append("</td></tr>");
+								
 							}
 						}else {
 							
@@ -289,8 +305,20 @@ public class EncogProcessor {
 								
 								correctPredictionNumTotal++;
 								rmseTotal = Math.pow((Double.valueOf(elementChosen) - Double.valueOf(correct)), 2);
+								
+								predResult.append("<strong>" + elementChosen + "</strong>");
+								predResult.append("</td><td>");
+								predResult.append("<strong>" + correct + "</strong>");
+								predResult.append("</td></tr>");
+							}else {
+								
+								predResult.append("<strong style=\"background-color:yellow;color:red;\">" + elementChosen + "</strong>");
+								predResult.append("</td><td>");
+								predResult.append("<strong>" + correct + "</strong>");
+								predResult.append("</td></tr>");
 							}
 						}
+						
 						if(outputs!=null && outputs.length>0) {
 							
 							for (int i = 0; i != outputs.length; i++) {
@@ -313,6 +341,8 @@ public class EncogProcessor {
 
 						lineCounter++;
 					}
+					predResult.append("</table></span>");
+					
 					if(predictionType==1) 
 						rmse = Math.sqrt(rmseTotal/lineCounter);
 					else
